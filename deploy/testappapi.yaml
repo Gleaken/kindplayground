@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testappsapi
+  namespace: mydeploys
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testappsapi
+  template:
+    metadata:
+      labels:
+        app: testappsapi
+    spec:
+      containers:
+        - name: testappapi
+          image: testapi:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata: 
+  name: testappsapi-service
+spec:
+  selector:
+    app: test
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+
