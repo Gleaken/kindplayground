@@ -27,7 +27,7 @@ metadata:
   name: testappsapi-service
 spec:
   selector:
-    app: test
+    app: testappsapi
   ports:
     - protocol: TCP
       port: 8080
