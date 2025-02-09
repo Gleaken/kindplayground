@@ -1,8 +1,11 @@
+using Prometheus;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.UseHttpClientMetrics();
 
 var app = builder.Build();
 
@@ -13,6 +16,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseHttpMetrics();
 
 var summaries = new[]
 {
@@ -21,6 +25,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
+    Counter ProcessedJobCount = Metrics.CreateCounter("myapp_jobs_processed_total", "Number of processed jobs.");
     var forecast =  Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
@@ -29,9 +34,12 @@ app.MapGet("/weatherforecast", () =>
             summaries[Random.Shared.Next(summaries.Length)]
         ))
         .ToArray();
+    ProcessedJobCount.Inc();
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.UseMetricServer();
 
 app.Run();
 
